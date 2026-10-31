@@ -25,11 +25,15 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+.npm-cache/
 
 # Local environment and keys
 .env*
 .dev.vars*
 *.pem
+
+# Local SQLite data used on Node / Hostinger deployments
+/data/
 
 # Checkout-local tool state
 /.wrangler/

@@ -17,44 +17,63 @@ Live preview: https://withindesk-private-ai.workspace-831295.chatgpt.site/
 
 - TypeScript
 - React 19
-- Next.js 16 through Vinext
-- Cloudflare Workers
-- Cloudflare D1
-- Drizzle ORM
+- Next.js 16
+- Hostinger / Node.js standalone deployment
+- SQLite via better-sqlite3 + Drizzle ORM
+
+Optional legacy path still present in the repo:
+
+- Vinext + Cloudflare Workers / D1 (`npm run build:sites`, `npm run start:sites`)
 
 ## Requirements
 
 - Node.js 22.13 or newer
-- pnpm 11 or newer
+- npm or pnpm 11+
 
 ## Run locally
 
 ```bash
-corepack enable
-pnpm install
+npm install
 npm run build
+npm run start
 ```
 
-Apply the included local D1 migration once:
-
-```bash
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_far_hemingway.sql
-```
-
-Start the development server:
+For local development:
 
 ```bash
 npm run dev
 ```
 
-The development server normally opens on `http://localhost:5173`.
+The development server opens on `http://localhost:3000`.
+
+## Hostinger Node.js hosting
+
+Hostinger expects a Next.js standalone server at:
+
+```text
+dist/standalone/server.js
+```
+
+This project now builds that artifact with:
+
+```bash
+npm run build
+```
+
+Set the Hostinger app settings to:
+
+- Build command: `npm run build`
+- Start command: `npm run start` or `node dist/standalone/server.js`
+- Node version: 22+
+
+Beta requests are stored in a local SQLite file at `data/withindesk.sqlite` by default. Override with `DATABASE_PATH` if needed.
 
 ## Important commands
 
 ```bash
-npm run dev          # Development server
-npm run build        # Production build
-npm run start        # Run the built Worker locally
+npm run dev          # Next.js development server
+npm run build        # Hostinger-ready standalone production build
+npm run start        # Run dist/standalone/server.js
 npm run db:generate  # Generate a new migration after schema changes
 ```
 
@@ -86,6 +105,8 @@ worker/       Cloudflare Worker entry point
 
 ## Deployment note
 
-The beta application currently uses Cloudflare D1. If the project is later deployed to a conventional Node.js host, replace the D1 adapter in `db/index.ts` with PostgreSQL, MySQL, or another supported database.
+The default Hostinger / Node.js path stores beta requests in local SQLite (`better-sqlite3`). For multi-instance production, point `DATABASE_PATH` at durable storage or replace the adapter in `db/index.ts` with PostgreSQL / MySQL.
+
+The original Cloudflare D1 + Vinext path remains available through `npm run build:sites` / `npm run start:sites`.
 
 No passwords, API keys, repository credentials, or customer data are included in this package.

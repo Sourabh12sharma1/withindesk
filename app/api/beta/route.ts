@@ -48,7 +48,11 @@ export async function POST(request: Request) {
     return Response.json({ ok: true }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected error";
-    const unavailable = message.includes("no such table") || message.includes("D1 binding");
+    const unavailable =
+        message.includes("no such table") ||
+        message.includes("D1 binding") ||
+        message.includes("SQLITE_") ||
+        message.includes("better-sqlite3");
     return Response.json(
       {
         error: unavailable
