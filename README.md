@@ -62,7 +62,10 @@ npm run build
 
 Set the Hostinger app settings to:
 
-- Build command: `npm run build`
+- Framework: Next.js
+- Package manager: npm
+- Build script: `build` (`next build --webpack`)
+- Output Directory: `dist`
 - Start command: `npm run start` or `node dist/standalone/server.js`
 - Node version: 22+
 
