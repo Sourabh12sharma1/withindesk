@@ -26,6 +26,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .npm-cache/
+.corepack/
+.tools/
 
 # Local environment and keys
 .env*

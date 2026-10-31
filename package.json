@@ -74,7 +74,14 @@
     }
   },
   "packageManager": "pnpm@11.25.0",
-  "allowScripts": {
-    "better-sqlite3@12.11.1": true
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild",
+      "fsevents",
+      "sharp",
+      "unrs-resolver",
+      "workerd"
+    ]
   }
 }

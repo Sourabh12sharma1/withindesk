@@ -1,20 +1,23 @@
-# Copied Sites are standalone projects and cannot inherit the monorepo policy.
-minimumReleaseAge: 10080
-minimumReleaseAgeIgnoreMissingTime: false
-trustLockfile: false
-strictDepBuilds: true
+# Hostinger uses pnpm with strict dependency builds.
+# Approve every package that needs a native/postinstall script.
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
+  - fsevents
+  - sharp
+  - unrs-resolver
+  - workerd
 allowBuilds:
+  better-sqlite3: true
   esbuild: true
   fsevents: true
   sharp: true
   unrs-resolver: true
   workerd: true
-storeDir: ${SITES_PNPM_SHARED_STORE:-.sites-runtime/pnpm-store}
-cacheDir: ${SITES_PNPM_SHARED_STORE:-.sites-runtime/pnpm-store}/policy-cache
+strictDepBuilds: false
+trustLockfile: true
 enableGlobalVirtualStore: false
-# Reuse store files with clones or hardlinks before falling back to copies.
 packageImportMethod: auto
-# The explicit installer owns dependency setup, including restored workspaces.
 verifyDepsBeforeRun: false
 optimisticRepeatInstall: false
 overrides:
