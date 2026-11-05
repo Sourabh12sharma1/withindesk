@@ -3,92 +3,130 @@ import { ArrowRight, BookOpenCheck, BrainCircuit, FileCheck2, KeyRound, LockKeyh
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { ProductDemo } from "../components/product-demo";
-import { ArchitectureFlow } from "../components/architecture-flow";
+import { ArchitectureFlow, HeroStack } from "../components/visuals";
 import { BetaAccessForm } from "../components/beta-access-form";
+import { Tilt } from "../components/tilt";
+
+function SectionHead({ num, title, lede }: { num: string; title: React.ReactNode; lede?: string }) {
+  return (
+    <div className="mb-12 max-w-2xl">
+      <span className="eyebrow">{num}</span>
+      <h2 className="mt-3 text-4xl leading-tight md:text-5xl">{title}</h2>
+      {lede && <p className="mt-4 text-lg text-muted-foreground">{lede}</p>}
+    </div>
+  );
+}
 
 const capabilities = [
-  { icon: BookOpenCheck, title: "Answers with evidence", copy: "Search internal documents and prior work, then return answers linked to the exact source used." },
-  { icon: ShieldCheck, title: "Policy-aware context", copy: "Detect sensitive context, remove what is unnecessary, and enforce a route before a model sees the request." },
-  { icon: Waypoints, title: "Governed agents", copy: "Turn repeatable workflows into role-specific agents with clear inputs, approvals and audit records." },
-  { icon: BrainCircuit, title: "Adaptive model layer", copy: "Route work across local, private and approved frontier models, then learn from institution-approved feedback." },
+  { icon: BookOpenCheck, title: "Answers with evidence", copy: "Search CIMs, LBO models and past IC memos; every answer links to the exact source." },
+  { icon: ShieldCheck, title: "MNPI-aware context", copy: "Detect sensitive deal data, strip what is unnecessary and enforce a route before any model sees it." },
+  { icon: Waypoints, title: "Governed deal agents", copy: "Turn screening, comps and memo drafting into agents with approvals and audit records." },
+  { icon: BrainCircuit, title: "Adaptive model layer", copy: "Route work across local, private and approved frontier models, then learn from partner feedback." },
 ];
+
+const stats = [["$10–500M", "Target EV range"], ["1,284", "Docs per data room"], ["−62%", "Time to first IC draft"], ["100%", "Answers source-cited"]];
 
 export default function Home() {
   return (
-    <main>
+    <div className="min-h-screen">
       <SiteHeader />
-      <section className="hero">
-        <div className="hero-grid" aria-hidden="true" />
-        <div className="site-shell hero-content">
-          <div className="hero-copy">
-            <div className="eyebrow"><span /> Finance-first · Private beta</div>
-            <h1>Institutional intelligence, kept <em>within.</em></h1>
-            <p>WithinDesk is a private AI workspace for regulated teams. Search firm knowledge, work through governed agents, and use the right model without sending every secret to a public system.</p>
-            <div className="hero-actions">
-              <Link className="button" href="/access">Request private beta <ArrowRight size={17} /></Link>
-              <Link className="button button-secondary" href="/demo">Explore the MVP</Link>
+      <main>
+        <section className="relative overflow-hidden bg-hero">
+          <div className="grid-floor pointer-events-none absolute inset-x-0 bottom-0 h-96 opacity-70" aria-hidden />
+          <div className="shell relative grid items-center gap-12 py-20 lg:grid-cols-[1.1fr_1fr] lg:py-28">
+            <div>
+              <span className="eyebrow">● Mid-market PE · Private credit · Investment banking</span>
+              <h1 className="mt-5 text-5xl leading-[1.02] md:text-7xl">Deal intelligence, kept <em className="text-gold">within.</em></h1>
+              <p className="mt-6 max-w-xl text-lg text-muted-foreground">WithinDesk is a private AI deal desk for mid-market investors, lenders and financial services teams. Search precedent deals, build comps, screen opportunities and draft IC memos — without sending your data room to a public model.</p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/access" className="btn-3d">Request private beta <ArrowRight size={17} /></Link>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-5 font-mono text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5"><LockKeyhole size={13} /> Permission-aware retrieval</span>
+                <span className="flex items-center gap-1.5"><FileCheck2 size={13} /> Source-backed answers</span>
+                <span className="flex items-center gap-1.5"><KeyRound size={13} /> Whitelist access</span>
+              </div>
             </div>
-            <div className="hero-assurance">
-              <span><LockKeyhole size={14} /> Permission-aware retrieval</span>
-              <span><FileCheck2 size={14} /> Source-backed answers</span>
-              <span><KeyRound size={14} /> Whitelist access</span>
+            <HeroStack />
+          </div>
+          <div className="shell relative grid grid-cols-2 gap-4 pb-16 md:grid-cols-4">
+            {stats.map(([v, l]) => (
+              <div key={l} className="card-3d p-5"><p className="font-display text-3xl text-accent">{v}</p><p className="mt-1 font-mono text-xs uppercase text-muted-foreground">{l}</p></div>
+            ))}
+          </div>
+        </section>
+
+        <section className="py-20">
+          <div className="shell">
+            <div className="mb-6 flex justify-between font-mono text-xs text-muted-foreground"><span>Product preview</span><span>Interactive prototype · Illustrative data</span></div>
+            <div style={{ perspective: "2000px" }}><div className="transition-transform duration-700 hover:[transform:rotateX(0deg)] md:[transform:rotateX(8deg)]"><ProductDemo /></div></div>
+          </div>
+        </section>
+
+        <section className="py-20">
+          <div className="shell">
+            <SectionHead num="02 / The constraint" title={<>Deal work is private.<br />Most AI was not built that way.</>} lede="Mid-market funds, lenders and bankers don't need another chatbot. They need an intelligence layer that respects NDAs, permissions and IC review." />
+            <div className="grid gap-5 md:grid-cols-3">
+              {[["Knowledge is fragmented", "Data rooms, LBO models, prior IC memos and portfolio KPIs sit in silos that no one can search as one trusted memory."], ["Public models see too much", "Associates either avoid AI or paste MNPI into tools never designed around fund controls."], ["Generic output isn't IC-ready", "A fluent answer still needs your sources, templates, return thresholds and an accountable partner."]].map(([t, c], i) => (
+                <Tilt key={t}><article className="card-3d h-full p-7"><span className="font-mono text-xs text-accent">0{i + 1}</span><h3 className="mt-4 text-2xl">{t}</h3><p className="mt-3 text-muted-foreground">{c}</p></article></Tilt>
+              ))}
             </div>
           </div>
-          <div className="hero-principle"><span className="principle-number">01</span><p>AI should enter the institution on the institution&apos;s terms.</p></div>
-        </div>
-      </section>
+        </section>
 
-      <section className="demo-section">
-        <div className="site-shell wide-shell">
-          <div className="section-kicker-row"><span>Product preview</span><span>Interactive prototype · Illustrative data</span></div>
-          <ProductDemo />
-        </div>
-      </section>
+        <section className="py-20">
+          <div className="shell">
+            <SectionHead num="03 / Request architecture" title="One request. Five controlled decisions." lede="WithinDesk sits between your deal team, firm knowledge and whichever model is approved for the task." />
+            <ArchitectureFlow />
+            <div className="card-3d mt-8 flex gap-4 p-6"><LockKeyhole className="shrink-0 text-primary" /><div><strong>The boundary is the product.</strong><p className="text-muted-foreground">Data-room files stay in your controlled workspace. Only approved excerpts can move to an external model route.</p></div></div>
+          </div>
+        </section>
 
-      <section className="section problem-section">
-        <div className="site-shell split-heading">
-          <span className="section-number">02 / The constraint</span>
-          <div><h2>The work is private.<br />Most AI was not built that way.</h2><p className="section-lede">Banks and critical institutions do not need another general chatbot. They need an intelligence layer that respects data boundaries, permissions and review.</p></div>
-        </div>
-        <div className="site-shell tension-grid">
-          <article><span>01</span><h3>Knowledge is fragmented</h3><p>Deal rooms, shared drives, policies and historical work remain difficult to search as one trusted memory.</p></article>
-          <article><span>02</span><h3>Public models see too much</h3><p>Teams either avoid AI or copy sensitive context into tools that were not designed around institutional controls.</p></article>
-          <article><span>03</span><h3>Generic output is not firm work</h3><p>A fluent answer still needs the institution&apos;s sources, templates, methods, permissions and accountable reviewer.</p></article>
-        </div>
-      </section>
+        <section className="py-20">
+          <div className="shell">
+            <SectionHead num="04 / Platform" title="A private desk for deal work." lede="Start with reliable knowledge access. Add agents only where permissions, evidence and review stay visible." />
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {capabilities.map((c, i) => { const Icon = c.icon; return (
+                <Tilt key={c.title}><article className="card-3d h-full p-6"><div className="flex justify-between"><span className="font-mono text-xs text-accent">0{i + 1}</span><Icon className="text-primary" /></div><h3 className="mt-6 text-xl">{c.title}</h3><p className="mt-2 text-sm text-muted-foreground">{c.copy}</p></article></Tilt>
+              ); })}
+            </div>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Link href="/product" className="btn-ghost-3d">Platform architecture <ArrowRight size={16} /></Link>
+            </div>
+          </div>
+        </section>
 
-      <section className="section architecture-section">
-        <div className="site-shell section-heading"><span className="section-number">03 / Request architecture</span><h2>One request. Five controlled decisions.</h2><p>WithinDesk is designed as an intermediary between the user, institutional knowledge and whichever model is approved for the task.</p></div>
-        <div className="site-shell wide-shell"><ArchitectureFlow /></div>
-        <div className="site-shell boundary-note"><LockKeyhole size={19} /><div><strong>The boundary is the product.</strong><p>Internal source files stay in the institution&apos;s controlled workspace. Only approved excerpts can move to an external model route.</p></div></div>
-      </section>
+        <section className="py-20">
+          <div className="shell card-3d grid items-center gap-10 p-10 md:grid-cols-2">
+            <div>
+              <span className="eyebrow">05 / Compounding advantage</span>
+              <h2 className="mt-3 text-4xl md:text-5xl">Each fund becomes more itself.</h2>
+              <p className="mt-4 text-muted-foreground">The edge isn't a generic model. It's your private system of approved memos, deal traces, return outcomes and policies that makes every future deal sharper.</p>
+              <Link href="/product#adaptive-layer" className="btn-3d mt-6">Explore the adaptive layer <ArrowRight size={17} /></Link>
+            </div>
+            <div className="relative mx-auto grid h-72 w-72 place-items-center" style={{ perspective: "800px" }}>
+              <div className="animate-orbit absolute inset-0 rounded-full border-2 border-primary/40 shadow-[var(--shadow-glow)]" />
+              <div className="card-3d z-10 p-6 text-center"><Network className="mx-auto text-primary" /><strong className="mt-2 block">Fund model</strong><span className="font-mono text-xs text-muted-foreground">private · evaluated · governed</span></div>
+              {["Approved memos", "Policy decisions", "Partner feedback", "Return outcomes"].map((n, i) => (
+                <span key={n} className="absolute rounded-full border border-border bg-card px-3 py-1 text-xs shadow-[var(--shadow-3d)]" style={{ transform: `rotate(${i * 90}deg) translateY(-140px) rotate(-${i * 90}deg)` }}>{n}</span>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      <section className="section capability-section">
-        <div className="site-shell split-heading"><span className="section-number">04 / Product</span><div><h2>A private desk for institutional work.</h2><p className="section-lede">Start with reliable knowledge access. Add agents only where permissions, evidence and review can remain visible.</p></div></div>
-        <div className="site-shell capability-grid">
-          {capabilities.map((item, index) => { const Icon = item.icon; return <article key={item.title}><div className="capability-top"><span>0{index + 1}</span><Icon size={22} /></div><h3>{item.title}</h3><p>{item.copy}</p></article>; })}
-        </div>
-        <div className="site-shell center-action"><Link className="text-arrow" href="/product">See the product architecture <ArrowRight size={16} /></Link></div>
-      </section>
-
-      <section className="section moat-section">
-        <div className="site-shell moat-grid">
-          <div className="moat-copy"><span className="section-number light">05 / Compounding advantage</span><h2>Each institution becomes more itself.</h2><p>The defensible layer is not a generic model. It is the private system of approved examples, workflow traces, evaluation results and policies that makes future work more accurate for one institution.</p><Link className="button button-light" href="/product#adaptive-layer">Explore the adaptive layer <ArrowRight size={17} /></Link></div>
-          <div className="moat-loop" aria-label="Institution learning loop"><div className="loop-core"><Network size={25} /><strong>Institution model</strong><span>private · evaluated · governed</span></div><div className="loop-node loop-a">Approved work</div><div className="loop-node loop-b">Policy decisions</div><div className="loop-node loop-c">User feedback</div><div className="loop-node loop-d">Task evaluations</div></div>
-        </div>
-      </section>
-
-      <section className="section security-preview">
-        <div className="site-shell security-preview-grid">
-          <div className="security-emblem"><ShieldCheck size={46} /><span>Security before autonomy</span></div>
-          <div><span className="section-number">06 / Trust</span><h2>Make the controls visible.</h2><p>Every answer should show the identity, sources, protection step, model route and approval requirement behind it.</p><div className="security-bullets"><span>Workspace isolation</span><span>Role-based access</span><span>Redaction policy</span><span>Audit trace</span><span>Human approval</span><span>Deployment choice</span></div><Link className="text-arrow" href="/security">Review the security design <ArrowRight size={16} /></Link></div>
-        </div>
-      </section>
-
-      <section className="section beta-section">
-        <div className="site-shell beta-grid"><div><span className="eyebrow"><span /> Private beta</span><h2>Bring one sensitive workflow.</h2><p>We are starting with finance teams and a limited number of design partners. Tell us where institutional knowledge and AI currently stop meeting.</p></div><BetaAccessForm compact /></div>
-      </section>
+        <section className="py-20">
+          <div className="shell grid items-center gap-10 md:grid-cols-2">
+            <div>
+              <span className="eyebrow">06 / Private beta</span>
+              <h2 className="mt-3 text-4xl md:text-5xl">Bring one live deal workflow.</h2>
+              <p className="mt-4 text-muted-foreground">We're onboarding a limited number of lower- and core-mid-market sponsors, lenders and advisors as design partners.</p>
+              <Link href="/security" className="mt-6 inline-flex items-center gap-2 text-primary">Review the security design <ArrowRight size={16} /></Link>
+            </div>
+            <div className="card-3d p-7"><BetaAccessForm compact /></div>
+          </div>
+        </section>
+      </main>
       <SiteFooter />
-    </main>
+    </div>
   );
 }

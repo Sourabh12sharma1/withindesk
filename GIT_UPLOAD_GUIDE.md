@@ -28,3 +28,4 @@ git push -u origin main
 - Add the legal entity and privacy contact.
 - Do not add `.env`, credentials, customer files, or production database exports.
 - Keep `node_modules`, `dist`, `.wrangler`, and local runtime folders out of Git.
+- After the push, set Hostinger MySQL env vars from `.env.example` so form submissions persist. See `HOSTINGER.md`.

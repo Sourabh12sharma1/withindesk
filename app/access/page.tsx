@@ -1,25 +1,32 @@
 import type { Metadata } from "next";
 import { CheckCircle2, LockKeyhole } from "lucide-react";
-import { SiteHeader } from "../../components/site-header";
-import { SiteFooter } from "../../components/site-footer";
+import { Page } from "../../components/chrome";
 import { BetaAccessForm } from "../../components/beta-access-form";
 
 export const metadata: Metadata = {
   title: "Request private beta",
-  description: "Apply for whitelist access to the WithinDesk private beta.",
+  description: "Apply for whitelist access to the WithinDesk private beta for mid-market investors, lenders and investment banking teams.",
 };
 
 export default function AccessPage() {
   return (
-    <main>
-      <SiteHeader />
-      <section className="access-page">
-        <div className="site-shell access-grid">
-          <div className="access-copy"><span className="eyebrow"><span /> Whitelist access</span><h1>Bring one real workflow.</h1><p>We are onboarding a small number of finance and regulated-industry design partners. Access is reviewed institution by institution.</p><div className="access-points"><span><CheckCircle2 size={17} /> One defined workflow and owner</span><span><CheckCircle2 size={17} /> A permissioned source set</span><span><CheckCircle2 size={17} /> Weekly product feedback</span><span><LockKeyhole size={17} /> Controlled beta environment</span></div></div>
-          <div className="access-form-card"><div><span>Private beta application</span><small>Usually takes under two minutes.</small></div><BetaAccessForm /></div>
+    <Page>
+      <section className="bg-hero py-20"><div className="shell grid gap-12 md:grid-cols-2">
+        <div>
+          <span className="eyebrow">Whitelist access</span>
+          <h1 className="mt-4 text-5xl md:text-6xl">Bring one real deal workflow.</h1>
+          <p className="mt-6 text-lg text-muted-foreground">We're onboarding a small number of mid-market sponsors, private credit lenders, investment banking teams and advisors. Access is reviewed firm by firm.</p>
+          <ul className="mt-8 space-y-3">
+            {["One defined workflow and owner", "A permissioned source set", "Weekly product feedback"].map((t) => <li key={t} className="flex items-center gap-2"><CheckCircle2 size={17} className="text-primary" />{t}</li>)}
+            <li className="flex items-center gap-2"><LockKeyhole size={17} className="text-primary" />Controlled beta environment</li>
+          </ul>
         </div>
-      </section>
-      <SiteFooter />
-    </main>
+        <div className="card-3d p-8" style={{ transform: "perspective(1200px) rotateY(-4deg)" }}>
+          <p className="font-semibold">Private beta application</p>
+          <p className="mb-6 text-sm text-muted-foreground">Usually takes under two minutes.</p>
+          <BetaAccessForm />
+        </div>
+      </div></section>
+    </Page>
   );
 }

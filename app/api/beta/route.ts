@@ -1,6 +1,4 @@
-import { eq } from "drizzle-orm";
-import { getDb } from "../../../db";
-import { betaRequests } from "../../../db/schema";
+import { saveBetaRequest } from "../../../db";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,18 +31,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = getDb();
-    const existing = await db
-      .select({ id: betaRequests.id })
-      .from(betaRequests)
-      .where(eq(betaRequests.email, email))
-      .limit(1);
-
-    if (existing.length) {
+    const result = await saveBetaRequest({ email, organization, role, useCase, consent });
+    if (result.duplicate) {
       return Response.json({ ok: true, duplicate: true });
     }
-
-    await db.insert(betaRequests).values({ email, organization, role, useCase, consent });
     return Response.json({ ok: true }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected error";
@@ -52,7 +42,11 @@ export async function POST(request: Request) {
         message.includes("no such table") ||
         message.includes("D1 binding") ||
         message.includes("SQLITE_") ||
-        message.includes("better-sqlite3");
+        message.includes("better-sqlite3") ||
+        message.includes("MySQL") ||
+        message.includes("ECONNREFUSED") ||
+        message.includes("ER_ACCESS_DENIED") ||
+        message.includes("ER_BAD_DB_ERROR");
     return Response.json(
       {
         error: unavailable

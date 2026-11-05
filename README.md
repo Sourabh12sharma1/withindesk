@@ -10,7 +10,8 @@ Live preview: https://withindesk-private-ai.workspace-831295.chatgpt.site/
 - Interactive finance workflow prototype
 - Product architecture and security pages
 - Private-beta application form
-- Cloudflare D1-backed request storage
+- Hostinger MySQL storage for production waitlist submissions
+- Local SQLite fallback for development
 - Drizzle schema and database migration
 
 ## Technology
@@ -19,7 +20,8 @@ Live preview: https://withindesk-private-ai.workspace-831295.chatgpt.site/
 - React 19
 - Next.js 16
 - Hostinger / Node.js standalone deployment
-- SQLite via better-sqlite3 + Drizzle ORM
+- Hostinger MySQL (`mysql2`) for production form storage
+- SQLite via better-sqlite3 + Drizzle ORM for local development
 
 Optional legacy path still present in the repo:
 
@@ -69,7 +71,9 @@ Set the Hostinger app settings to:
 - Start command: `npm run start` or `node dist/standalone/server.js`
 - Node version: 22+
 
-Beta requests are stored in a local SQLite file at `data/withindesk.sqlite` by default. Override with `DATABASE_PATH` if needed.
+On Hostinger, set `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD` and `MYSQL_DATABASE` so every form submit is stored in Hostinger MySQL (`beta_requests`). See `HOSTINGER.md` and `.env.example`.
+
+Locally, with those variables unset, beta requests are stored in `data/withindesk.sqlite`.
 
 ## Important commands
 
@@ -100,7 +104,8 @@ Alternatively, extract the ZIP and drag the extracted files into GitHub's web up
 ```text
 app/          Pages and API routes
 components/   Product interface and reusable components
-db/           D1 database access and schema
+db/           MySQL (Hostinger) + SQLite database access
+sql/          Hostinger MySQL table script
 drizzle/      Database migrations
 public/       Static assets
 worker/       Cloudflare Worker entry point
@@ -108,7 +113,7 @@ worker/       Cloudflare Worker entry point
 
 ## Deployment note
 
-The default Hostinger / Node.js path stores beta requests in local SQLite (`better-sqlite3`). For multi-instance production, point `DATABASE_PATH` at durable storage or replace the adapter in `db/index.ts` with PostgreSQL / MySQL.
+On Hostinger, set the MySQL environment variables so waitlist rows land in a durable database. SQLite remains the local fallback only.
 
 The original Cloudflare D1 + Vinext path remains available through `npm run build:sites` / `npm run start:sites`.
 
