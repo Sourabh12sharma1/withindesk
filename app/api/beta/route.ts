@@ -1,9 +1,24 @@
-import { saveBetaRequest } from "../../../db";
+import { getDatabaseStatus, saveBetaRequest } from "../../../db";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function clean(value: unknown, limit: number) {
   return typeof value === "string" ? value.trim().slice(0, limit) : "";
+}
+
+export async function GET() {
+  const status = await getDatabaseStatus();
+  return Response.json(
+    {
+      ok: status.ok,
+      stored: status.database,
+      table: status.table,
+      database: status.name,
+      total: status.total,
+      error: status.error,
+    },
+    { status: status.ok ? 200 : 503 }
+  );
 }
 
 export async function POST(request: Request) {
@@ -32,25 +47,29 @@ export async function POST(request: Request) {
     }
 
     const result = await saveBetaRequest({ email, organization, role, useCase, consent });
+    const status = await getDatabaseStatus();
     if (result.duplicate) {
-      return Response.json({ ok: true, duplicate: true });
+      return Response.json({ ok: true, duplicate: true, stored: status.database });
     }
-    return Response.json({ ok: true }, { status: 201 });
+    return Response.json({ ok: true, stored: status.database }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected error";
     const unavailable =
-        message.includes("no such table") ||
-        message.includes("D1 binding") ||
-        message.includes("SQLITE_") ||
-        message.includes("better-sqlite3") ||
-        message.includes("MySQL") ||
-        message.includes("ECONNREFUSED") ||
-        message.includes("ER_ACCESS_DENIED") ||
-        message.includes("ER_BAD_DB_ERROR");
+      message.includes("no such table") ||
+      message.includes("D1 binding") ||
+      message.includes("SQLITE_") ||
+      message.includes("better-sqlite3") ||
+      message.includes("MySQL") ||
+      message.includes("ECONNREFUSED") ||
+      message.includes("ER_ACCESS_DENIED") ||
+      message.includes("ER_BAD_DB_ERROR") ||
+      message.includes("not configured");
     return Response.json(
       {
         error: unavailable
-          ? "Beta access is being configured. Please try again shortly."
+          ? message.includes("not configured")
+            ? "Hostinger MySQL is not connected yet. Set MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD and MYSQL_DATABASE, then restart the app."
+            : "Beta access is being configured. Please try again shortly."
           : "We could not save your request. Please try again.",
       },
       { status: 500 }

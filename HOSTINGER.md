@@ -68,10 +68,49 @@ MYSQL_DATABASE=u178751471_beta_form
 
 Redeploy / restart the app after saving env vars. The password never goes in Git.
 
-## 4. Check it
+## 4. Workflow: form → MySQL → phpMyAdmin
 
-1. Open `https://withindesk.com/access`
-2. Submit the private-beta form
-3. In phpMyAdmin, open `beta_requests` and confirm the row
+```text
+User fills https://withindesk.com/access
+        ↓
+POST /api/beta
+        ↓
+Node app creates table beta_requests if missing
+        ↓
+INSERT into Hostinger MySQL  u178751471_beta_form
+        ↓
+phpMyAdmin → Databases → u178751471_beta_form → beta_requests → Browse
+```
+
+Production **does not** use SQLite. If the MySQL env vars are missing, the form shows an error instead of a fake success.
+
+### Check the live connection
+
+Open:
+
+https://withindesk.com/api/beta
+
+You want:
+
+```json
+{
+  "ok": true,
+  "stored": "mysql",
+  "table": "beta_requests",
+  "database": "u178751471_beta_form",
+  "total": 1
+}
+```
+
+If `stored` is `unconfigured` or `ok` is false, the Node.js env vars are missing or the password is wrong. Fix them, **restart** the app, then submit the form again.
+
+### See the row in phpMyAdmin
+
+1. hPanel → **Databases → phpMyAdmin**
+2. Left: **`u178751471_beta_form`** (must be this database, not another one)
+3. Click **`beta_requests`**
+4. Tab **Browse**
+
+If the table is still missing after a successful MySQL save, you are looking at the wrong database in phpMyAdmin.
 
 Locally, with no MySQL env vars, the same form still writes to `data/withindesk.sqlite`.

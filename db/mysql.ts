@@ -26,24 +26,29 @@ const CREATE_TABLE_SQL = `
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 `;
 
+function env(name: string) {
+  return process.env[name]?.trim() || "";
+}
+
 export function getMysqlConfig(): MysqlConfig | null {
-  const url = process.env.DATABASE_URL?.trim();
+  const url = env("DATABASE_URL");
   if (url && /^mysql(s)?:\/\//i.test(url)) {
     return { kind: "url", url };
   }
 
-  const host = process.env.MYSQL_HOST?.trim();
-  const user = process.env.MYSQL_USER?.trim();
-  const database = process.env.MYSQL_DATABASE?.trim();
+  const host = env("MYSQL_HOST") || env("DB_HOST");
+  const user = env("MYSQL_USER") || env("DB_USER");
+  const database = env("MYSQL_DATABASE") || env("DB_NAME") || env("MYSQL_DB");
+  const password = env("MYSQL_PASSWORD") || env("DB_PASSWORD");
   if (!host || !user || !database) return null;
 
   return {
     kind: "options",
     options: {
       host,
-      port: Number(process.env.MYSQL_PORT || 3306),
+      port: Number(env("MYSQL_PORT") || env("DB_PORT") || "3306"),
       user,
-      password: process.env.MYSQL_PASSWORD ?? "",
+      password,
       database,
       waitForConnections: true,
       connectionLimit: 5,
@@ -56,11 +61,41 @@ export function usesMysql() {
   return getMysqlConfig() !== null;
 }
 
+export function describeMysqlConfig() {
+  const config = getMysqlConfig();
+  if (!config) {
+    return { configured: false as const };
+  }
+  if (config.kind === "url") {
+    try {
+      const parsed = new URL(config.url);
+      return {
+        configured: true as const,
+        host: parsed.hostname,
+        port: parsed.port || "3306",
+        user: decodeURIComponent(parsed.username),
+        database: parsed.pathname.replace(/^\//, ""),
+      };
+    } catch {
+      return { configured: true as const, host: "url", port: "", user: "", database: "" };
+    }
+  }
+  return {
+    configured: true as const,
+    host: String(config.options.host || ""),
+    port: String(config.options.port || 3306),
+    user: String(config.options.user || ""),
+    database: String(config.options.database || ""),
+  };
+}
+
 function getPool() {
   if (globalThis.__withindeskMysql) return globalThis.__withindeskMysql;
   const config = getMysqlConfig();
   if (!config) {
-    throw new Error("MySQL is not configured. Set MYSQL_HOST, MYSQL_USER, MYSQL_DATABASE, MYSQL_PASSWORD.");
+    throw new Error(
+      "MySQL is not configured. In Hostinger set MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD and MYSQL_DATABASE, then restart the Node.js app."
+    );
   }
   const pool =
     config.kind === "url"
@@ -74,7 +109,11 @@ async function ensureSchema() {
   if (!globalThis.__withindeskMysqlReady) {
     globalThis.__withindeskMysqlReady = getPool()
       .query(CREATE_TABLE_SQL)
-      .then(() => undefined);
+      .then(() => undefined)
+      .catch((error) => {
+        globalThis.__withindeskMysqlReady = undefined;
+        throw error;
+      });
   }
   await globalThis.__withindeskMysqlReady;
 }
@@ -86,6 +125,25 @@ function isDuplicateError(error: unknown) {
       "code" in error &&
       (error as { code?: string }).code === "ER_DUP_ENTRY"
   );
+}
+
+export async function pingMysql() {
+  const summary = describeMysqlConfig();
+  if (!summary.configured) {
+    return { ok: false as const, error: "MySQL environment variables are missing." };
+  }
+  try {
+    await ensureSchema();
+    const pool = getPool();
+    const [rows] = await pool.query("SELECT COUNT(*) AS total FROM beta_requests");
+    const total = Array.isArray(rows) && rows[0] && typeof rows[0] === "object" && "total" in rows[0]
+      ? Number((rows[0] as { total: number }).total)
+      : 0;
+    return { ok: true as const, table: "beta_requests", total };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "MySQL connection failed.";
+    return { ok: false as const, error: message };
+  }
 }
 
 export async function saveMysqlBetaRequest(input: BetaRequestInput): Promise<BetaSaveResult> {
