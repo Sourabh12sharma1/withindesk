@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://withindesk-private-ai.workspace-831295.chatgpt.site"),
+  metadataBase: new URL("https://withindesk.com"),
   title: {
     default: "WithinDesk",
     template: "%s | WithinDesk",

@@ -67,7 +67,7 @@ Redeploy / restart the app after saving env vars.
 
 ## 4. Check it
 
-1. Open `https://YOUR-DOMAIN/access`
+1. Open `https://withindesk.com/access`
 2. Submit the private-beta form
 3. In phpMyAdmin, open `beta_requests` and confirm the row
 

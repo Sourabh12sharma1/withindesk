@@ -2,7 +2,7 @@
 
 WithinDesk is a finance-first private AI workspace for regulated teams. This repository contains the public product website, interactive MVP prototype, security architecture pages, and private-beta application flow.
 
-Live preview: https://withindesk-private-ai.workspace-831295.chatgpt.site/
+Live site: https://withindesk.com
 
 ## What is included
 
