@@ -31,16 +31,19 @@ Keep `.env`, `.env.local`, and `data/` out of Git. They are already gitignored.
 
 ## 2. Create the MySQL database on Hostinger
 
-In hPanel:
+withindesk.com uses this Hostinger MySQL database:
 
-1. Open **Databases → MySQL Databases** (or **Management → MySQL Databases**).
-2. Create a database, for example `uXXXX_withindesk`.
-3. Create a user and grant **ALL PRIVILEGES** on that database.
-4. Note host, port, database name, user, and password.
-   - On Hostinger Node.js hosting the host is usually `localhost`.
-   - Port is usually `3306`.
+| Setting | Value |
+|---|---|
+| Database | `u178751471_beta_form` |
+| Username | `u178751471_betaform` |
+| Host | `localhost` |
+| Port | `3306` |
+| Table | `beta_requests` (created automatically, or run `sql/hostinger-mysql.sql`) |
 
-Optional: in **phpMyAdmin**, run `sql/hostinger-mysql.sql`. If you skip this, the Node app creates the table on the first form submit.
+Hostinger sets the password automatically and does not show it in that create screen. Reset or copy it in hPanel **Databases → MySQL Databases**, then put it only in the Node.js app environment as `MYSQL_PASSWORD`. Do not commit it.
+
+Confirm the user `u178751471_betaform` has **ALL PRIVILEGES** on `u178751471_beta_form`.
 
 ## 3. Connect Git → Hostinger Node.js
 
@@ -58,12 +61,12 @@ Add environment variables (same names as `.env.example`):
 ```text
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
-MYSQL_USER=uXXXX_withindesk
-MYSQL_PASSWORD=your-db-password
-MYSQL_DATABASE=uXXXX_withindesk
+MYSQL_USER=u178751471_betaform
+MYSQL_PASSWORD=paste-the-hpanel-password-here
+MYSQL_DATABASE=u178751471_beta_form
 ```
 
-Redeploy / restart the app after saving env vars.
+Redeploy / restart the app after saving env vars. The password never goes in Git.
 
 ## 4. Check it
 
