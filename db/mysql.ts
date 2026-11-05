@@ -8,6 +8,10 @@ declare global {
   var __withindeskMysqlReady: Promise<void> | undefined;
 }
 
+type MysqlConfig =
+  | { kind: "url"; url: string }
+  | { kind: "options"; options: mysql.PoolOptions };
+
 const CREATE_TABLE_SQL = `
   CREATE TABLE IF NOT EXISTS beta_requests (
     id INT NOT NULL AUTO_INCREMENT,
@@ -22,10 +26,10 @@ const CREATE_TABLE_SQL = `
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 `;
 
-export function getMysqlConfig() {
+export function getMysqlConfig(): MysqlConfig | null {
   const url = process.env.DATABASE_URL?.trim();
   if (url && /^mysql(s)?:\/\//i.test(url)) {
-    return { url };
+    return { kind: "url", url };
   }
 
   const host = process.env.MYSQL_HOST?.trim();
@@ -34,15 +38,18 @@ export function getMysqlConfig() {
   if (!host || !user || !database) return null;
 
   return {
-    host,
-    port: Number(process.env.MYSQL_PORT || 3306),
-    user,
-    password: process.env.MYSQL_PASSWORD ?? "",
-    database,
-    waitForConnections: true,
-    connectionLimit: 5,
-    charset: "utf8mb4",
-  } as const;
+    kind: "options",
+    options: {
+      host,
+      port: Number(process.env.MYSQL_PORT || 3306),
+      user,
+      password: process.env.MYSQL_PASSWORD ?? "",
+      database,
+      waitForConnections: true,
+      connectionLimit: 5,
+      charset: "utf8mb4",
+    },
+  };
 }
 
 export function usesMysql() {
@@ -55,7 +62,10 @@ function getPool() {
   if (!config) {
     throw new Error("MySQL is not configured. Set MYSQL_HOST, MYSQL_USER, MYSQL_DATABASE, MYSQL_PASSWORD.");
   }
-  const pool = "url" in config ? mysql.createPool(config.url) : mysql.createPool(config);
+  const pool =
+    config.kind === "url"
+      ? mysql.createPool(config.url)
+      : mysql.createPool(config.options);
   globalThis.__withindeskMysql = pool;
   return pool;
 }
